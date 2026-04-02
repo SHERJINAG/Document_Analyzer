@@ -1,0 +1,206 @@
+/* Global Styles */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+/* Navbar Enhancements */
+.navbar {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar-brand {
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+}
+
+.navbar button:hover {
+  transform: translateY(-2px);
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 10%, transparent 10%);
+  background-size: 30px 30px;
+  animation: moveBackground 20s linear infinite;
+}
+
+@keyframes moveBackground {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(50px, 50px);
+  }
+}
+
+.hero-section h1 {
+  font-weight: 700;
+}
+
+.hero-section button {
+  transition: all 0.3s ease;
+}
+
+.hero-section button:hover {
+  transform: scale(1.05);
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* Statistics Section */
+.bg-light h2 {
+  color: #0d6efd;
+  font-size: 2.2rem;
+}
+
+.bg-light p {
+  font-weight: 500;
+}
+
+/* How It Works Section */
+.step-box {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  transition: 0.3s;
+}
+
+.step-box:hover {
+  background: #f1f5ff;
+  transform: translateY(-5px);
+}
+
+/* Call To Action */
+.cta-section {
+  background: linear-gradient(135deg, #0d6efd, #0a58ca);
+}
+
+.cta-section button {
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.cta-section button:hover {
+  background-color: #ffffff;
+  color: #0d6efd;
+}
+
+/* Footer */
+footer {
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+  .hero-section {
+    height: auto;
+    padding: 60px 20px;
+  }
+
+  .card {
+    margin-bottom: 20px;
+  }
+
+
+}
+
+/* Wrapper */
+
+.dashboard-wrapper {
+  min-height: 100vh;
+}
+
+/* Sidebar */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 260px;
+  height: 100vh;
+  transition: left 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar.show {
+  left: 0;
+}
+
+/* Overlay */
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+/* Main content */
+
+.main-content {
+  width: 100%;
+}
+
+/* Desktop */
+
+@media (min-width: 768px) {
+
+  .sidebar {
+    left: 0;
+  }
+
+  .main-content {
+    margin-left: 260px;
+  }
+
+}
+
+/* Card hover effect */
+
+.stat-card {
+  transition: 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+
+
