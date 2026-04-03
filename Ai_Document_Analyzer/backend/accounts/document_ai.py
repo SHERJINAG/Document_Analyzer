@@ -59,12 +59,69 @@ def extract_text_from_docx(file_path):
         logging.error(f"DOCX extraction error: {e}")
     return text
 
+import logging
+import pytesseract
+import requests
+from PIL import Image
+import os
+
+HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
+
 def extract_text_from_image(file_path):
     try:
-        image = Image.open(file_path)
-        text = pytesseract.image_to_string(image)
-        logging.info(f"Image OCR completed: {file_path}")
-        return text
+        # Try local Tesseract first
+        try:
+            image = Image.open(file_path)
+            text = pytesseract.image_to_string(image)
+
+            if text.strip():
+                logging.info(f"Local OCR (Tesseract) completed: {file_path}")
+                return text
+
+        except Exception as local_error:
+            logging.warning(f"Tesseract not available, switching to API OCR: {local_error}")
+
+        # Fallback to Hugging Face OCR
+        try:
+            API_URL = (
+                "https://api-inference.huggingface.co/models/"
+                "microsoft/trocr-base-printed"
+            )
+
+            headers = {
+                "Authorization": f"Bearer {HUGGINGFACE_API_KEY}"
+            }
+
+            with open(file_path, "rb") as f:
+                image_bytes = f.read()
+
+            response = requests.post(
+                API_URL,
+                headers=headers,
+                data=image_bytes,
+                timeout=60
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+
+                # Extract text safely
+                if isinstance(result, list) and "generated_text" in result[0]:
+                    text = result[0]["generated_text"]
+                else:
+                    text = str(result)
+
+                logging.info(f"API OCR completed: {file_path}")
+                return text
+
+            else:
+                logging.error(f"OCR API error: {response.text}")
+                return ""
+
+        except Exception as api_error:
+            logging.error(f"OCR API failed: {api_error}")
+            return ""
+
     except Exception as e:
         logging.error(f"Image OCR error: {e}")
         return ""
