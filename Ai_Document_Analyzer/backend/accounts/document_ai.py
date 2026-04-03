@@ -7,7 +7,7 @@ import pytesseract
 import pdfplumber
 from docx import Document as DocxDocument
 from PIL import Image
-
+import platform
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -25,7 +25,12 @@ logging.basicConfig(
 )
 
 # Path to Tesseract executable
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+else:
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
 # =========================
 # TEXT EXTRACTION
