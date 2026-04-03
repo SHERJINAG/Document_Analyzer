@@ -188,4 +188,12 @@ def my_documents(request):
         return JsonResponse({"status": "success", "documents": data})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+import subprocess
+from django.http import JsonResponse
 
+def system_check(request):
+    return JsonResponse({
+        "tesseract_version": subprocess.getoutput("tesseract --version"),
+        "tesseract_path": subprocess.getoutput("which tesseract"),
+        "python_version": subprocess.getoutput("python --version"),
+    })
