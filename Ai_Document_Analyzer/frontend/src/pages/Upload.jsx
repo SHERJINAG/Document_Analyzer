@@ -85,7 +85,7 @@ export default function UploadPage() {
       email: user.email
     };
 
-    const response = await fetch("http://127.0.0.1:8000/api/document-analyze/", {
+    const response = await fetch("https://document-analyzer-backend-wx2t.onrender.com/api/document-analyze/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
