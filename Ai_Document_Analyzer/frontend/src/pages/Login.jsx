@@ -12,7 +12,7 @@ export function Login() {
   e.preventDefault();
 
   const response = await fetch(
-    "https://document-analyzer-backend-wx2t.onrender.com",
+    "https://document-analyzer-backend-wx2t.onrender.com/login/",
     {
       method: "POST",
       headers: {
