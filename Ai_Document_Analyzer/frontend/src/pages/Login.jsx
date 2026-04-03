@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export function Login() {
   const navigate = useNavigate();
@@ -96,9 +97,9 @@ export function Login() {
 
             <div className="text-center">
               <span>Don't have an account? </span>
-              <a href="/signup" className="text-primary fw-semibold">
-                Sign Up
-              </a>
+              <Link to="/signup" className="text-primary fw-semibold">
+  Sign Up
+</Link>
             </div>
 
           </div>
