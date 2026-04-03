@@ -188,4 +188,11 @@ def my_documents(request):
         return JsonResponse({"status": "success", "documents": data})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+import subprocess
 
+def check_tesseract():
+    try:
+        result = subprocess.check_output(["tesseract", "--version"])
+        print("Tesseract OK:", result.decode())
+    except Exception as e:
+        print("Tesseract NOT installed:", e)
