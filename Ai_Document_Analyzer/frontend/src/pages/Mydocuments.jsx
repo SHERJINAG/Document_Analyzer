@@ -24,7 +24,7 @@ export default function MyDocuments() {
   const fetchDocuments = async (email) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/my-documents/?email=${email}`
+        `https://document-analyzer-backend-wx2t.onrender.com/my-documents/?email=${email}`
       );
       const data = await response.json();
       if (data.status === "success") {
