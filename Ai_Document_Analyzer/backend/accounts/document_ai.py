@@ -63,32 +63,80 @@ def extract_text_from_docx(file_path):
 
 
 
-OCR_API_KEY =os.getenv("OCR_KEY") # replace with your key
+import requests
+import os
+import io
+import time
+from PIL import Image
+
+OCR_API_KEY = os.getenv("OCR_KEY")
+API_URL = "https://api.ocr.space/parse/image"
+
+MAX_RETRIES = 3
+
 
 def extract_text_from_image(file_path):
     try:
+        if not os.path.exists(file_path):
+            print("File not found")
+            return ""
+
         # Open image
         image = Image.open(file_path).convert("RGB")
 
-        # Convert image to bytes
+        # Resize (important for Render memory)
+        image.thumbnail((1024, 1024))
+
+        # Convert to bytes
         buffer = io.BytesIO()
         image.save(buffer, format="PNG")
+        image_bytes = buffer.getvalue()
 
-        response = requests.post(
-            "https://api.ocr.space/parse/image",
-            data={
-                "apikey": OCR_API_KEY,
-                "language": "eng"
-            },
-            files={
-                "file": buffer.getvalue()
-            }
-        )
+        payload = {
+            "apikey": OCR_API_KEY,
+            "language": "eng",
+            "isOverlayRequired": False
+        }
 
-        result = response.json()
+        files = {
+            "file": ("image.png", image_bytes)
+        }
 
-        # Return extracted text
-        return result["ParsedResults"][0]["ParsedText"]
+        for attempt in range(MAX_RETRIES):
+
+            print(f"OCR Attempt {attempt + 1}")
+
+            response = requests.post(
+                API_URL,
+                data=payload,
+                files=files,
+                timeout=60
+            )
+
+            print("Status Code:", response.status_code)
+
+            if response.status_code != 200:
+                time.sleep(2)
+                continue
+
+            result = response.json()
+
+            print("OCR Response:", result)
+
+            # Handle API error
+            if result.get("IsErroredOnProcessing"):
+                print("OCR API Error:", result.get("ErrorMessage"))
+                return ""
+
+            parsed_results = result.get("ParsedResults")
+
+            if parsed_results and len(parsed_results) > 0:
+                return parsed_results[0].get("ParsedText", "")
+
+            return ""
+
+        print("OCR failed after retries")
+        return ""
 
     except Exception as e:
         print("OCR Error:", e)
