@@ -44,6 +44,9 @@ def extract_text_from_pdf(file_path):
                 if page_text:
                     text += page_text + "\n"
         logging.info(f"PDF extraction completed: {file_path}")
+        print("HF KEY:", HUGGINGFACE_API_KEY)
+        print("File exists:", os.path.exists(doc.file.path))
+        print("Text length:", len(text))
     except Exception as e:
         logging.error(f"PDF extraction error: {e}")
     return text
