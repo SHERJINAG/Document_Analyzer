@@ -63,61 +63,57 @@ def extract_text_from_docx(file_path):
 
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
+import logging
+import requests
+import os
+
+HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
+
 def extract_text_from_image(file_path):
     try:
-        # Try local Tesseract first
-        try:
-            image = Image.open(file_path)
-            text = pytesseract.image_to_string(image)
+        API_URL = (
+            "https://router.huggingface.co/hf-inference/models/"
+            "microsoft/trocr-base-printed"
+        )
 
-            if text.strip():
-                logging.info(f"Local OCR (Tesseract) completed: {file_path}")
-                return text
+        headers = {
+            "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
+            "Content-Type": "application/octet-stream"
+        }
 
-        except Exception as local_error:
-            logging.warning(f"Tesseract not available, switching to API OCR: {local_error}")
+        with open(file_path, "rb") as f:
+            image_bytes = f.read()
 
-        # Fallback to Hugging Face OCR
-        try:
-            API_URL = (
-                    "https://router.huggingface.co/hf-inference/models/microsoft/trocr-base-printed")
+        response = requests.post(
+            API_URL,
+            headers=headers,
+            data=image_bytes,
+            timeout=60
+        )
 
-            headers = {
-                "Authorization": f"Bearer {HUGGINGFACE_API_KEY}"
-            }
+        # Log status for debugging
+        logging.info(f"OCR API Status: {response.status_code}")
 
-            with open(file_path, "rb") as f:
-                image_bytes = f.read()
+        if response.status_code == 200:
+            result = response.json()
 
-            response = requests.post(
-                API_URL,
-                headers=headers,
-                data=image_bytes,
-                timeout=60
-            )
-
-            if response.status_code == 200:
-                result = response.json()
-
-                # Extract text safely
-                if isinstance(result, list) and "generated_text" in result[0]:
-                    text = result[0]["generated_text"]
-                else:
-                    text = str(result)
-
-                logging.info(f"API OCR completed: {file_path}")
-                return text
-
+            # Typical response format
+            if isinstance(result, list):
+                text = result[0].get("generated_text", "")
             else:
-                logging.error(f"OCR API error: {response.text}")
-                return ""
+                text = str(result)
 
-        except Exception as api_error:
-            logging.error(f"OCR API failed: {api_error}")
+            logging.info(f"OCR API completed: {file_path}")
+            return text
+
+        else:
+            logging.error(
+                f"OCR API error {response.status_code}: {response.text}"
+            )
             return ""
 
     except Exception as e:
-        logging.error(f"Image OCR error: {e}")
+        logging.error(f"OCR API failed: {e}")
         return ""
 
 def extract_text(file_path):
