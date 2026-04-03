@@ -137,7 +137,7 @@ export function Signup() {
             <div className="text-center">
               <span>Already have an account? </span>
              <Link to="/login" className="text-primary fw-semibold">
-  Sign Up
+Login
 </Link>
             </div>
           </div>
