@@ -60,15 +60,6 @@ def extract_text_from_docx(file_path):
     return text
 
 
-
-HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
-
-import logging
-import requests
-import os
-
-HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
-
 def extract_text_from_image(file_path):
     try:
         API_URL = (
@@ -77,13 +68,21 @@ def extract_text_from_image(file_path):
         )
 
         headers = {
-            "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
-            "Content-Type": "application/octet-stream"
+            "Authorization": f"Bearer {HUGGINGFACE_API_KEY}"
         }
 
-        with open(file_path, "rb") as f:
-            image_bytes = f.read()
+        # STEP 1 — Open and convert image
+        image = Image.open(file_path).convert("RGB")
 
+        # STEP 2 — Resize (prevents silent failures)
+        image.thumbnail((1024, 1024))
+
+        # STEP 3 — Convert to PNG bytes
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+        image_bytes = buffer.getvalue()
+
+        # STEP 4 — Send request
         response = requests.post(
             API_URL,
             headers=headers,
@@ -91,29 +90,25 @@ def extract_text_from_image(file_path):
             timeout=60
         )
 
-        # Log status for debugging
-        logging.info(f"OCR API Status: {response.status_code}")
+        logging.info(f"OCR Status: {response.status_code}")
+        logging.info(f"OCR Response: {response.text}")
 
-        if response.status_code == 200:
-            result = response.json()
-
-            # Typical response format
-            if isinstance(result, list):
-                text = result[0].get("generated_text", "")
-            else:
-                text = str(result)
-
-            logging.info(f"OCR API completed: {file_path}")
-            return text
-
-        else:
-            logging.error(
-                f"OCR API error {response.status_code}: {response.text}"
-            )
+        if response.status_code != 200:
             return ""
 
+        result = response.json()
+
+        # Handle multiple response formats
+        if isinstance(result, list):
+            return result[0].get("generated_text", "")
+
+        if isinstance(result, dict):
+            return result.get("generated_text", "")
+
+        return ""
+
     except Exception as e:
-        logging.error(f"OCR API failed: {e}")
+        logging.error(f"OCR failed: {e}")
         return ""
 
 def extract_text(file_path):
