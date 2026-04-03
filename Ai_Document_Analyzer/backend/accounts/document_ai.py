@@ -10,6 +10,8 @@ from PIL import Image
 import platform
 from dotenv import load_dotenv
 
+import io
+
 # Load environment variables
 load_dotenv()
 
@@ -60,55 +62,36 @@ def extract_text_from_docx(file_path):
     return text
 
 
+
+OCR_API_KEY =os.getenv("OCR_KEY") # replace with your key
+
 def extract_text_from_image(file_path):
     try:
-        API_URL = (
-            "https://router.huggingface.co/hf-inference/models/"
-            "microsoft/trocr-base-printed"
-        )
-
-        headers = {
-            "Authorization": f"Bearer {HUGGINGFACE_API_KEY}"
-        }
-
-        # STEP 1 — Open and convert image
+        # Open image
         image = Image.open(file_path).convert("RGB")
 
-        # STEP 2 — Resize (prevents silent failures)
-        image.thumbnail((1024, 1024))
-
-        # STEP 3 — Convert to PNG bytes
+        # Convert image to bytes
         buffer = io.BytesIO()
         image.save(buffer, format="PNG")
-        image_bytes = buffer.getvalue()
 
-        # STEP 4 — Send request
         response = requests.post(
-            API_URL,
-            headers=headers,
-            data=image_bytes,
-            timeout=60
+            "https://api.ocr.space/parse/image",
+            data={
+                "apikey": OCR_API_KEY,
+                "language": "eng"
+            },
+            files={
+                "file": buffer.getvalue()
+            }
         )
-
-        logging.info(f"OCR Status: {response.status_code}")
-        logging.info(f"OCR Response: {response.text}")
-
-        if response.status_code != 200:
-            return ""
 
         result = response.json()
 
-        # Handle multiple response formats
-        if isinstance(result, list):
-            return result[0].get("generated_text", "")
-
-        if isinstance(result, dict):
-            return result.get("generated_text", "")
-
-        return ""
+        # Return extracted text
+        return result["ParsedResults"][0]["ParsedText"]
 
     except Exception as e:
-        logging.error(f"OCR failed: {e}")
+        print("OCR Error:", e)
         return ""
 
 def extract_text(file_path):
