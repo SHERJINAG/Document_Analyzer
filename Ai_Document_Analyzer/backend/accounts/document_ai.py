@@ -59,11 +59,7 @@ def extract_text_from_docx(file_path):
         logging.error(f"DOCX extraction error: {e}")
     return text
 
-import logging
-import pytesseract
-import requests
-from PIL import Image
-import os
+
 
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
@@ -84,9 +80,7 @@ def extract_text_from_image(file_path):
         # Fallback to Hugging Face OCR
         try:
             API_URL = (
-                "https://api-inference.huggingface.co/models/"
-                "microsoft/trocr-base-printed"
-            )
+                    "https://router.huggingface.co/hf-inference/models/microsoft/trocr-base-printed")
 
             headers = {
                 "Authorization": f"Bearer {HUGGINGFACE_API_KEY}"
