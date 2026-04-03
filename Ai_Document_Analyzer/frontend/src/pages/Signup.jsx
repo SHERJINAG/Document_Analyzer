@@ -134,9 +134,9 @@ export function Signup() {
             </form>
             <div className="text-center">
               <span>Already have an account? </span>
-              <a href="/login" className="text-primary fw-semibold">
-                Login
-              </a>
+             <Link to="/login" className="text-primary fw-semibold">
+  Sign Up
+</Link>
             </div>
           </div>
         </div>
