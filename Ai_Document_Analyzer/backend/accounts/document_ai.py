@@ -251,7 +251,21 @@ def analyze_sentiment(text):
         print("Sentiment exception:", e)
         return "NEUTRAL"
 
+import subprocess
+import logging
 
+def check_system():
+    try:
+        tesseract_version = subprocess.getoutput("tesseract --version")
+        logging.info(f"TESSERACT VERSION: {tesseract_version}")
+    except Exception as e:
+        logging.error(f"Tesseract error: {e}")
+
+    try:
+        path = subprocess.getoutput("which tesseract")
+        logging.info(f"TESSERACT PATH: {path}")
+    except Exception as e:
+        logging.error(f"Path error: {e}")
 # =========================
 # MAIN PROCESS
 # =========================
@@ -265,7 +279,7 @@ def process_document(file_path):
 
     if not text.strip():
         return {"status": "error", "message": "No text extracted"}
-
+    check_system()
     summary = summarize_text(text)
     entities = extract_entities_cleaned(text)
     sentiment = analyze_sentiment(text)
